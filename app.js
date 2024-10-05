@@ -5,12 +5,28 @@ require('dotenv').config()
 
 const tasks = require('./routes/tasks');
 const users = require('./routes/users');
+const notFound = require('./middleware/notFound');
+
+// const middle1 = (req, res, next) => {
+//     console.log("middle1");
+//     next();
+// }
+
+// const middle2 = (req, res, next) => {
+//     console.log("middle2");
+//     next();
+// }
+
 app.use(express.json());
 app.use('/home', express.static('./public'));
 app.use('/auth', express.static('./public/auth'));
 
-// app.use('/', tasks)
+app.use('/', tasks)
 app.use('/user', users);
+app.use(notFound);
+
+// app.use(middle1);
+// app.use(middle2);
 
 const port = 3000;
 
@@ -19,6 +35,7 @@ const start  = async () => {
         await connectDB(process.env.MONGO_URI);
         app.listen(port, console.log('Server started at port ' + port));
     } catch (error) {
+        console.log("Unable to connect to DB server");
         console.log(error);
     }
 }

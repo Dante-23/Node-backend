@@ -6,26 +6,30 @@ require('dotenv').config()
 const tasks = require('./routes/tasks');
 const users = require('./routes/users');
 const notFound = require('./middleware/notFound');
+const {errorHandler} = require('./middleware/errorHandler');
 
-// const middle1 = (req, res, next) => {
-//     console.log("middle1");
-//     next();
-// }
 
-// const middle2 = (req, res, next) => {
-//     console.log("middle2");
-//     next();
-// }
+const middle1 = (req, res, next) => {
+    console.log("middle1");
+    next();
+}
+
+const middle2 = (req, res, next) => {
+    console.log("middle2 " + res.status);
+    next();
+}
 
 app.use(express.json());
 app.use('/home', express.static('./public'));
 app.use('/auth', express.static('./public/auth'));
 
+// app.use(middle1);
+
 app.use('/', tasks)
 app.use('/user', users);
 app.use(notFound);
+app.use(errorHandler);
 
-// app.use(middle1);
 // app.use(middle2);
 
 const port = 3000;

@@ -1,32 +1,32 @@
 const Task = require('../models/Task');
-const getAllTasks = async (req, res) => {
+const getAllTasks = async (req, res, next) => {
     try {
         const tasks = await Task.find({});
         res.status(200).json({tasks});
     } catch (error) {
-        res.status(500).json({msg: error});
+        handleError(res, 500, next);
     }
 }
 
-const createTask = async (req, res) => {
+const createTask = async (req, res, next) => {
     try {
         const task = await Task.create(req.body);
         res.status(201).json({task})
     } catch (error) {
-        res.status(500).json({msg: error});
+        handleError(res, 500, next);
     }
 }
  
-const getTask = async (req, res) => {
+const getTask = async (req, res, next) => {
     const {id: taskId} = req.params;
     try {
         const task = await Task.findOne({_id: taskId});
         if (!task) {
-            return res.status(404).json({msg: "Cannot find task with id: " + taskId});
+            handleError(res, 404, next);
         }
         res.status(200).json({task});
     } catch (error) {
-        res.status(500).json({error});
+        handleError(res, 500, next);
     }
 }
 
@@ -35,11 +35,11 @@ const getTaskWithName = async (req, res) => {
     try {
         const tasks = await Task.find({name: reqName});
         if (!tasks) {
-            return res.status(404).json({msg: "Cannot find task with name: " + reqName});
+            handleError(res, 404, next);
         }
         res.status(200).json({tasks});
     } catch (error) {
-        res.status(500).json({error});
+        handleError(res, 500, next);
     }
 }
 
@@ -51,11 +51,11 @@ const updateTask = async (req, res) => {
             runValidators: true
         });
         if (!task) {
-            return res.status(404).json({msg: "Cannot find task with id: " + taskId});
+            handleError(res, 404, next);
         }
         res.status(200).json({task});
     } catch (error) {
-        res.status(500).json({error});
+        handleError(res, 500, next);
     }
 }
 
@@ -64,12 +64,19 @@ const deleteTask = async (req, res) => {
     try {
         const task = await Task.findOneAndDelete({_id: taskId});
         if (!task) {
-            return res.status(404).json({msg: "Cannot find task with id: " + taskId});
+            handleError(res, 404, next);
         }
         res.status(200).json({task});
     } catch (error) {
-        res.status(500).json({error});
+        handleError(res, 500, next);
     }
+}
+
+const handleError = (res, status, next) => {
+    console.log("handleError called");
+    res.isError = true;
+    res.errorStatus = status;
+    next();
 }
 
 module.exports = {
